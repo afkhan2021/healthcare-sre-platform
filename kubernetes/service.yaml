@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: healthcare-api
+  namespace: healthcare-dev
+  labels:
+    app: healthcare-api
+spec:
+  type: ClusterIP
+  selector:
+    app: healthcare-api
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8000

@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: healthcare-api
+  namespace: healthcare-dev
+  labels:
+    release: kube-prometheus-stack
+    app: healthcare-api
+spec:
+  namespaceSelector:
+    matchNames:
+      - healthcare-dev
+  selector:
+    matchLabels:
+      app: healthcare-api
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s

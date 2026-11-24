@@ -1,0 +1,20 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!.example.tfvars
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Secrets and environment files
+.env
+.env.*
+!.env.example
+monitoring/grafana-admin-password.txt
+
+# Operating system
+.DS_Store
