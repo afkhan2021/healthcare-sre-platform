@@ -18,3 +18,7 @@ monitoring/grafana-admin-password.txt
 
 # Operating system
 .DS_Store
+
+# Python test coverage
+.coverage
+htmlcov/
