@@ -93,4 +93,24 @@ Actions:
 - pip check: Passed.
 - Trivy: 0 Critical findings; outstanding High, Medium, Low and Unknown findings remain.
 
+### GitHub Actions CI Validation
+
+**Workflow:** Healthcare SRE Platform CI
+**Run:** [Run #5](https://github.com/afkhan2021/healthcare-sre-platform/actions/runs/45702846333)
+**Commit:** `0e1ba8f`
+**Date:** November 25, 2026
+
+The container security checks were successfully executed in GitHub-hosted CI.
+
+| Validation | Result |
+|---|---|
+| Docker image build | Passed |
+| Trivy full vulnerability report | Passed |
+| Debian OS findings (all severities) | 222 |
+| Python package findings | 0 |
+| Trivy Critical-only scan | 0 findings |
+| Critical vulnerability gate | Passed |
+
+The Critical-only scan returned zero findings for both Debian OS packages and Python packages. The full scan continues to report outstanding OS vulnerabilities, which remain subject to remediation and monitoring.
+
 **Assessment conclusion:** The container has undergone security hardening and runtime dependency analysis. It is not vulnerability-free or certified for medical or production use. Outstanding operating-system vulnerabilities require ongoing remediation and risk monitoring.
