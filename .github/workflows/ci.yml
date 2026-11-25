@@ -1,0 +1,42 @@
+
+name: Healthcare SRE Platform CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: API Tests and Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: application/requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r application/requirements-dev.txt
+
+      - name: Run tests with coverage
+        run: |
+          PYTHONPATH=application python -m pytest application/tests/test_main.py \
+            --cov=app.main \
+            --cov-report=term-missing \
+            --cov-fail-under=90 \
+            -v
