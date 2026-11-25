@@ -1,0 +1,60 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: healthcare-sli-recording-rules
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: healthcare-sli-rules
+      interval: 30s
+      rules:
+        # Eligible requests exclude HTTP 4xx client errors.
+        - record: healthcare_api:eligible_requests:rate5m
+          expr: |
+            sum(rate(healthcare_api_requests_by_status_total{status_code=~"2..|3..|5.."}[5m]))
+
+        # Successful requests are HTTP 2xx and 3xx.
+        - record: healthcare_api:successful_requests:rate5m
+          expr: |
+            sum(rate(healthcare_api_requests_by_status_total{status_code=~"2..|3.."}[5m]))
+
+        # Availability SLI. No traffic means no SLI value.
+        - record: healthcare_api:availability:ratio5m
+          expr: |
+            (
+              100 *
+              healthcare_api:successful_requests:rate5m
+              /
+              healthcare_api:eligible_requests:rate5m
+            )
+            and
+            (healthcare_api:eligible_requests:rate5m > 0)
+
+        # HTTP 5xx error rate. No traffic means no SLI value.
+        - record: healthcare_api:error_rate:ratio5m
+          expr: |
+            (
+              100 *
+              (
+                sum(rate(healthcare_api_errors_total[5m]))
+                or vector(0)
+              )
+              /
+              healthcare_api:eligible_requests:rate5m
+            )
+            and
+            (healthcare_api:eligible_requests:rate5m > 0)
+
+        # Percentage of successful requests completed within 300ms.
+        - record: healthcare_api:latency_within_300ms:ratio5m
+          expr: |
+            (
+              100 *
+              sum(rate(healthcare_api_request_duration_seconds_bucket{le="0.3"}[5m]))
+              /
+              sum(rate(healthcare_api_request_duration_seconds_count[5m]))
+            )
+            and
+            (sum(rate(healthcare_api_request_duration_seconds_count[5m])) > 0)

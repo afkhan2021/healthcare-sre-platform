@@ -1,7 +1,7 @@
 prometheus:
   prometheusSpec:
     replicas: 1
-    retention: 24h
+    retention: 30d
     resources:
       requests:
         cpu: 200m

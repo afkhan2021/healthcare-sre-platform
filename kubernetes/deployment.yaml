@@ -27,7 +27,7 @@ spec:
 
       containers:
         - name: healthcare-api
-          image: 056283020027.dkr.ecr.ca-central-1.amazonaws.com/healthcare-sre-api:v2
+          image: 056283020027.dkr.ecr.ca-central-1.amazonaws.com/healthcare-sre-api:v4
           imagePullPolicy: IfNotPresent
 
           ports:
