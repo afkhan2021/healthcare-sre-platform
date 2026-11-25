@@ -1,7 +1,16 @@
+FROM python:3.12-slim-trixie
 
-FROM python:3.12-slim
 
 WORKDIR /app
+
+# Apply Debian security and package updates
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip and setuptools to secure versions
+RUN python -m pip install --no-cache-dir --upgrade "pip>=26.2.0" "setuptools>=84.1.0"
 
 # Install application dependencies
 COPY requirements.txt .
