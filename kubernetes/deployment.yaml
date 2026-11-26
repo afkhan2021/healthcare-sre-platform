@@ -16,8 +16,8 @@ spec:
     metadata:
       labels:
         app: healthcare-api
-
     spec:
+      automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
