@@ -73,7 +73,19 @@ The remaining findings include util-linux, ACL, ncurses and systemd components. 
 - Verified Python dependency consistency using `pip check`.
 - Added narrowly scoped Trivy Rego exceptions for three pip bundled-SBOM setuptools findings.
 
-## 5. Residual Risk and Follow-up
+
+## 5. Software Bill of Materials (SBOM)
+
+Generated a CycloneDX 1.7 SBOM using Trivy 0.76.2.
+
+- Artifact: `security/container-sbom.cdx`
+- Image: `healthcare-sre-api:dev`
+- Components inventoried: 141
+- SBOM-based vulnerability scan: 222 Debian OS findings and 0 Python package findings.
+
+The SBOM-based scan reproduced the vulnerability counts from the direct image scan. This provides a machine-readable inventory for software component tracking and vulnerability analysis. It does not mean the outstanding OS vulnerabilities are resolved.
+
+## 6. Residual Risk and Follow-up
 
 The remaining HIGH and MEDIUM findings are not considered resolved.
 
@@ -86,7 +98,7 @@ Actions:
 6. Maintain documented risk acceptance for findings without available fixes.
 7. Keep container scanning as a CI security gate.
 
-## 6. Security Validation
+## 7. Security Validation
 
 - Bandit: Passed.
 - pip-audit: Passed with no known Python dependency vulnerabilities.
