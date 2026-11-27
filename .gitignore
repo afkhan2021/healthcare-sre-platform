@@ -22,3 +22,4 @@ monitoring/grafana-admin-password.txt
 # Python test coverage
 .coverage
 htmlcov/
+*.tfplan
