@@ -76,6 +76,7 @@ jobs:
           docker build \
             -f application/Dockerfile \
             -t healthcare-sre-api:ci \
+            -t healthcare-sre-api:${GITHUB_SHA} \
             .
 
       - name: Build Incident Receiver image
@@ -83,13 +84,14 @@ jobs:
           docker build \
             -f automation/incident-assistant/Dockerfile \
             -t healthcare-incident-receiver:ci \
+            -t healthcare-incident-receiver:${GITHUB_SHA} \
             .
 
       - name: Trivy API image vulnerability report
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           version: v0.76.2
-          image-ref: healthcare-sre-api:ci
+          image-ref: healthcare-sre-api:${{ github.sha }}
           scanners: vuln
           ignore-policy: .trivyignore.rego
           severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
@@ -101,7 +103,7 @@ jobs:
         with:
           version: v0.76.2
           skip-setup-trivy: true
-          image-ref: healthcare-sre-api:ci
+          image-ref: healthcare-sre-api:${{ github.sha }}
           scanners: vuln
           ignore-policy: .trivyignore.rego
           severity: CRITICAL
@@ -113,7 +115,7 @@ jobs:
         with:
           version: v0.76.2
           skip-setup-trivy: true
-          image-ref: healthcare-incident-receiver:ci
+          image-ref: healthcare-incident-receiver:${{ github.sha }}
           scanners: vuln
           severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
           format: table
@@ -124,7 +126,7 @@ jobs:
         with:
           version: v0.76.2
           skip-setup-trivy: true
-          image-ref: healthcare-incident-receiver:ci
+          image-ref: healthcare-incident-receiver:${{ github.sha }}
           scanners: vuln
           severity: CRITICAL
           format: table
