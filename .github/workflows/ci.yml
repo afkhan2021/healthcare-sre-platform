@@ -190,7 +190,11 @@ jobs:
       - security
       - kubernetes-security
 
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      vars.AWS_ROLE_TO_ASSUME != '' &&
+      vars.AWS_REGION != ''
 
     permissions:
       contents: read
