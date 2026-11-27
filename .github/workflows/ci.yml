@@ -181,3 +181,53 @@ jobs:
           severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
           format: table
           exit-code: '0'
+
+  publish-images:
+    name: Publish Verified Images to Amazon ECR
+    runs-on: ubuntu-latest
+    needs:
+      - test
+      - security
+      - kubernetes-security
+
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Configure AWS credentials through GitHub OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Healthcare API image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          docker build \
+            -f application/Dockerfile \
+            -t "$REGISTRY/healthcare-sre-api:$IMAGE_TAG" \
+            .
+          docker push "$REGISTRY/healthcare-sre-api:$IMAGE_TAG"
+
+      - name: Build and push Incident Receiver image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          docker build \
+            -f automation/incident-assistant/Dockerfile \
+            -t "$REGISTRY/healthcare-incident-receiver:$IMAGE_TAG" \
+            .
+          docker push "$REGISTRY/healthcare-incident-receiver:$IMAGE_TAG"
