@@ -1,0 +1,72 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: healthcare-slo-alert-rules
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: healthcare-slo-alerts
+      interval: 30s
+      rules:
+
+        # Critical: availability error budget burning too quickly.
+        - alert: HealthcareAPIAvailabilityFastBurn
+          expr: |
+            (
+              (100 - healthcare_api:availability:ratio5m) / 0.1 > 14.4
+            )
+            and
+            (
+              (100 - healthcare_api:availability:ratio1h) / 0.1 > 14.4
+            )
+          for: 2m
+          labels:
+            severity: critical
+            service: healthcare-api
+          annotations:
+            summary: Healthcare API availability error budget burning rapidly
+            description: Availability is consuming the 99.9% SLO error budget at more than 14.4 times the sustainable rate over both 5-minute and 1-hour windows.
+
+        # Warning: sustained availability error-budget consumption.
+        - alert: HealthcareAPIAvailabilitySlowBurn
+          expr: |
+            (
+              (100 - healthcare_api:availability:ratio30m) / 0.1 > 6
+            )
+            and
+            (
+              (100 - healthcare_api:availability:ratio6h) / 0.1 > 6
+            )
+          for: 15m
+          labels:
+            severity: warning
+            service: healthcare-api
+          annotations:
+            summary: Healthcare API availability error budget burning steadily
+            description: Availability is consuming the 99.9% SLO error budget at more than 6 times the sustainable rate over both 30-minute and 6-hour windows.
+
+        # Warning: too many requests exceed the 300ms latency objective.
+        - alert: HealthcareAPILatencySLOBreach
+          expr: |
+            healthcare_api:latency_within_300ms:ratio5m < 95
+          for: 10m
+          labels:
+            severity: warning
+            service: healthcare-api
+          annotations:
+            summary: Healthcare API latency SLO is not being met
+            description: Fewer than 95% of requests with HTTP status codes below 400 are completing within 300ms.
+
+        # Warning: HTTP 5xx error rate exceeds the 0.1% objective.
+        - alert: HealthcareAPIErrorRateSLOBreach
+          expr: |
+            healthcare_api:error_rate:ratio5m > 0.1
+          for: 5m
+          labels:
+            severity: warning
+            service: healthcare-api
+          annotations:
+            summary: Healthcare API HTTP 5xx error rate exceeds SLO
+            description: HTTP 5xx error rate has exceeded 0.1% over the 5-minute window.

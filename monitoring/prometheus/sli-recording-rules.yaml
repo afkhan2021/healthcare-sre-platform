@@ -20,7 +20,7 @@ spec:
           expr: |
             sum(rate(healthcare_api_requests_by_status_total{status_code=~"2..|3.."}[5m]))
 
-        # Availability SLI. No traffic means no SLI value.
+        # Availability SLI over 5 minutes.
         - record: healthcare_api:availability:ratio5m
           expr: |
             (
@@ -31,6 +31,48 @@ spec:
             )
             and
             (healthcare_api:eligible_requests:rate5m > 0)
+
+        # Availability SLI over 30 minutes.
+        - record: healthcare_api:availability:ratio30m
+          expr: |
+            (
+              100 *
+              sum(rate(healthcare_api_requests_by_status_total{status_code=~"2..|3.."}[30m]))
+              /
+              sum(rate(healthcare_api_requests_by_status_total{status_code=~"2..|3..|5.."}[30m]))
+            )
+            and
+            (
+              sum(rate(healthcare_api_requests_by_status_total{status_code=~"2..|3..|5.."}[30m])) > 0
+            )
+
+        # Availability SLI over 1 hour.
+        - record: healthcare_api:availability:ratio1h
+          expr: |
+            (
+              100 *
+              sum(rate(healthcare_api_requests_by_status_total{status_code=~"2..|3.."}[1h]))
+              /
+              sum(rate(healthcare_api_requests_by_status_total{status_code=~"2..|3..|5.."}[1h]))
+            )
+            and
+            (
+              sum(rate(healthcare_api_requests_by_status_total{status_code=~"2..|3..|5.."}[1h])) > 0
+            )
+
+        # Availability SLI over 6 hours.
+        - record: healthcare_api:availability:ratio6h
+          expr: |
+            (
+              100 *
+              sum(rate(healthcare_api_requests_by_status_total{status_code=~"2..|3.."}[6h]))
+              /
+              sum(rate(healthcare_api_requests_by_status_total{status_code=~"2..|3..|5.."}[6h]))
+            )
+            and
+            (
+              sum(rate(healthcare_api_requests_by_status_total{status_code=~"2..|3..|5.."}[6h])) > 0
+            )
 
         # HTTP 5xx error rate. No traffic means no SLI value.
         - record: healthcare_api:error_rate:ratio5m
@@ -47,7 +89,7 @@ spec:
             and
             (healthcare_api:eligible_requests:rate5m > 0)
 
-        # Percentage of successful requests completed within 300ms.
+        # Percentage of measured requests completed within 300ms.
         - record: healthcare_api:latency_within_300ms:ratio5m
           expr: |
             (
