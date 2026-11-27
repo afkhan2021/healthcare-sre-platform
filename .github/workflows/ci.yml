@@ -132,6 +132,38 @@ jobs:
           format: table
           exit-code: '1'
 
+      - name: Generate Healthcare API CycloneDX SBOM
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          version: v0.76.2
+          skip-setup-trivy: true
+          image-ref: healthcare-sre-api:${{ github.sha }}
+          scanners: vuln
+          format: cyclonedx
+          output: healthcare-sre-api-sbom.cdx.json
+          exit-code: '0'
+
+      - name: Generate Incident Receiver CycloneDX SBOM
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          version: v0.76.2
+          skip-setup-trivy: true
+          image-ref: healthcare-incident-receiver:${{ github.sha }}
+          scanners: vuln
+          format: cyclonedx
+          output: healthcare-incident-receiver-sbom.cdx.json
+          exit-code: '0'
+
+      - name: Upload container SBOM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: container-sboms
+          path: |
+            healthcare-sre-api-sbom.cdx.json
+            healthcare-incident-receiver-sbom.cdx.json
+          if-no-files-found: error
+          retention-days: 30
+
   kubernetes-security:
     name: Kubernetes Manifest Security
     runs-on: ubuntu-latest
