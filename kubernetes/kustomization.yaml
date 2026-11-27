@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+  - deployment.yaml
+  - service.yaml
+  - incident-receiver-deployment.yaml
+  - incident-receiver-service.yaml
+  - network-policy.yaml
+  - servicemonitor.yaml
+
+images:
+  - name: 056283020027.dkr.ecr.ca-central-1.amazonaws.com/healthcare-sre-api
+    newName: 056283020027.dkr.ecr.ca-central-1.amazonaws.com/healthcare-sre-api
+    newTag: v4
+
+  - name: 056283020027.dkr.ecr.ca-central-1.amazonaws.com/healthcare-incident-receiver
+    newName: 056283020027.dkr.ecr.ca-central-1.amazonaws.com/healthcare-incident-receiver
+    newTag: v6

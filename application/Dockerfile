@@ -1,6 +1,5 @@
 FROM python:3.12-slim-trixie
 
-
 WORKDIR /app
 
 # Apply Debian security and package updates
@@ -9,20 +8,20 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip and setuptools to secure versions
+# Upgrade pip and setuptools
 RUN python -m pip install --no-cache-dir --upgrade "pip>=26.2.0" "setuptools>=84.1.0"
 
 # Install application dependencies
-COPY requirements.txt .
+COPY application/requirements.txt ./requirements.txt
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN python -m pip install --no-cache-dir -r requirements.txt
 
 # Create a dedicated non-root user
 RUN groupadd --gid 10001 appuser \
     && useradd --uid 10001 --gid 10001 --create-home appuser
 
 # Copy application files with correct ownership
-COPY --chown=appuser:appuser app/ ./app/
+COPY --chown=appuser:appuser application/app/ ./app/
 
 # Run as non-root user
 USER appuser
