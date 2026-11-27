@@ -76,14 +76,45 @@ The remaining findings include util-linux, ACL, ncurses and systemd components. 
 
 ## 5. Software Bill of Materials (SBOM)
 
-Generated a CycloneDX 1.7 SBOM using Trivy 0.76.2.
+CycloneDX 1.7 SBOMs are generated automatically in GitHub Actions using Trivy 0.76.2 for both container images.
+
+### Local API SBOM
 
 - Artifact: `security/container-sbom.cdx`
 - Image: `healthcare-sre-api:dev`
 - Components inventoried: 141
 - SBOM-based vulnerability scan: 222 Debian OS findings and 0 Python package findings.
 
-The SBOM-based scan reproduced the vulnerability counts from the direct image scan. This provides a machine-readable inventory for software component tracking and vulnerability analysis. It does not mean the outstanding OS vulnerabilities are resolved.
+The SBOM-based scan reproduced the vulnerability counts from the direct image scan. This does not mean the outstanding OS vulnerabilities are resolved.
+
+### CI-generated container SBOMs
+
+The CI workflow generates separate SBOMs from the Git SHA-tagged images built during each run.
+
+| Container image | SBOM artifact | Components |
+|---|---|---:|
+| Healthcare API | `healthcare-sre-api-sbom.cdx.json` | 141 |
+| Incident Receiver | `healthcare-incident-receiver-sbom.cdx.json` | 134 |
+| **Total** | **2 SBOMs** | **275** |
+
+Validation performed on the downloaded CI artifacts:
+
+- Both files parsed successfully as JSON.
+- Both identify their format as CycloneDX.
+- Both use CycloneDX specification version 1.7.
+- Both contain metadata and component inventories.
+- Both component inventories were counted successfully.
+
+### CI artifact retention
+
+- Workflow: Healthcare SRE Platform CI
+- SBOM generation: Trivy 0.76.2
+- Output format: CycloneDX JSON
+- Artifact bundle: `container-sboms`
+- Retention: 30 days
+- Images are identified using their Git commit SHA tags.
+
+These machine-readable inventories support software component tracking, vulnerability analysis and future software supply-chain security controls. They do not establish that the images are vulnerability-free or certified for medical use.
 
 ## 6. Residual Risk and Follow-up
 
@@ -124,5 +155,25 @@ The container security checks were successfully executed in GitHub-hosted CI.
 | Critical vulnerability gate | Passed |
 
 The Critical-only scan returned zero findings for both Debian OS packages and Python packages. The full scan continues to report outstanding OS vulnerabilities, which remain subject to remediation and monitoring.
+
+### Latest SBOM CI Validation
+
+**Workflow:** Healthcare SRE Platform CI
+**Run:** #13 — Generate CycloneDX SBOMs for both container images
+**Commit:** `3f5f97c`
+**Date:** November 27, 2026
+**Result:** Successful
+
+| Validation | Result |
+|---|---|
+| API SBOM generation | Passed |
+| Incident Receiver SBOM generation | Passed |
+| CycloneDX JSON validation | Passed |
+| CycloneDX specification | 1.7 |
+| Total components inventoried | 275 |
+| GitHub Actions artifact upload | Passed |
+| Artifact retention | 30 days |
+
+GitHub Actions reported a non-fatal Node.js 20 deprecation warning for `actions/upload-artifact@v4`. This does not affect the successful workflow run and should be addressed in a future action-version maintenance update.
 
 **Assessment conclusion:** The container has undergone security hardening and runtime dependency analysis. It is not vulnerability-free or certified for medical or production use. Outstanding operating-system vulnerabilities require ongoing remediation and risk monitoring.
