@@ -18,7 +18,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Create a dedicated non-root user
-RUN useradd --create-home appuser
+RUN groupadd --gid 10001 appuser \
+    && useradd --uid 10001 --gid 10001 --create-home appuser
 
 # Copy application files with correct ownership
 COPY --chown=appuser:appuser app/ ./app/

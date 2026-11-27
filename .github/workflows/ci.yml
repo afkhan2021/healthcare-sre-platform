@@ -94,3 +94,21 @@ jobs:
           severity: CRITICAL
           format: table
           exit-code: '1'
+
+  kubernetes-security:
+    name: Kubernetes Manifest Security
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Trivy Kubernetes manifest scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          version: v0.76.2
+          scan-type: config
+          scan-ref: kubernetes/
+          severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+          format: table
+          exit-code: '0'
